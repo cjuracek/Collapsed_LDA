@@ -9,16 +9,14 @@ if __name__ == '__main__':
     
     # With version of sklearn below .22
     dataset = fetch_20newsgroups(shuffle=True, random_state=1, remove=('headers', 'footers', 'quotes'))
-    title_docs = {i: doc for i, doc in enumerate(dataset['data'])}
-              
-    titles_to_tokens = {title: tokenize_doc(doc) for title, doc in title_docs.items()}
+    id_to_tokens = {i: tokenize_doc(doc) for i, doc in enumerate(dataset['data'])}
 
     # Remove articles whose content is 'blah blah blah'
     extra_words = ['maxaxaxaxaxaxaxaxaxaxaxaxaxaxax', 'said', 'also', 'would', 'get', 'say', 'go', 'do', 'one']
-    titles_to_tokens = {title: remove_stop_words(tokens, extra_words=extra_words)
-                        for title, tokens in titles_to_tokens.items() if 'blah' not in tokens}
+    id_to_tokens = {title: remove_stop_words(tokens, extra_words=extra_words)
+                    for title, tokens in id_to_tokens.items() if 'blah' not in tokens}
     
-    titles_to_tokens_stem = {title: stem_tokens(tokens) for title, tokens in titles_to_tokens.items()}
+    titles_to_tokens_stem = {title: stem_tokens(tokens) for title, tokens in id_to_tokens.items()}
 
     unique_words = get_unique_words(titles_to_tokens_stem.values())
 

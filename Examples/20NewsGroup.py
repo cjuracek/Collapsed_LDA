@@ -9,10 +9,7 @@ if __name__ == '__main__':
     
     # With version of sklearn below .22
     dataset = fetch_20newsgroups(shuffle=True, random_state=1, remove=('headers', 'footers', 'quotes'))
-    data = dataset['data']
-    title_docs = {}
-    for i in range(len(data)):
-        title_docs[i] = data[i]
+    title_docs = {i: doc for i, doc in enumerate(dataset['data'])}
               
     titles_to_tokens = {title: tokenize_doc(doc) for title, doc in title_docs.items()}
 

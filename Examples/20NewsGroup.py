@@ -3,7 +3,7 @@ from src.utility import *
 from src.sampler import LatentDirichletAllocation, get_unique_words
 from src.inference import *
 from sklearn.datasets import fetch_20newsgroups
-from time import time
+from time import perf_counter
 
 if __name__ == '__main__':
     
@@ -12,7 +12,7 @@ if __name__ == '__main__':
     data = dataset['data']
     title_docs = {}
     for i in range(len(data)):
-            title_docs[i] = data[i]
+        title_docs[i] = data[i]
               
     titles_to_tokens = {title: tokenize_doc(doc) for title, doc in title_docs.items()}
 
@@ -24,7 +24,10 @@ if __name__ == '__main__':
     titles_to_tokens_stem = {title: stem_tokens(tokens) for title, tokens in titles_to_tokens.items()}
 
     unique_words = get_unique_words(titles_to_tokens_stem.values())
-    t0 = time()
+
+    # Run LDA
+    start_time = perf_counter()
     topic, phi, theta = LatentDirichletAllocation(titles_to_tokens_stem, K=20, alpha=2/20, niter=10)
-    print("done in %0.3fs." % (time() - t0))
+    end_time = perf_counter()
+    print(f'Done in {(end_time - start_time):.2f}')
     print(get_top_n_words(phi, 5, unique_words))

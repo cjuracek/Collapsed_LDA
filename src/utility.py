@@ -78,3 +78,13 @@ def stem_tokens(tokens):
     ps = PorterStemmer()
     tokens_stemmed = [ps.stem(token) for token in tokens]
     return tokens_stemmed
+
+
+# Remove stop words and lemmatize
+def preprocess_spacy_doc(doc, stop_words):
+    # Get all lowercased lemmas from document
+    lemmas = [token.lemma_.lower() for token in doc if token.text.isalpha()]
+
+    # Remove all stop words / lemmas that are too short
+    lemmas = [lemma for lemma in lemmas if lemma not in stop_words and len(lemma) > 2]
+    return lemmas

@@ -9,12 +9,13 @@ import spacy
 import en_core_web_sm
 
 if __name__ == '__main__':
-    nlp = en_core_web_sm.load(disable=['parser', 'textcat'])
-    #nlp = spacy.load('en_core_web_sm')
 
     # With version of sklearn below .22
     dataset = fetch_20newsgroups(shuffle=True, random_state=1, remove=('headers', 'footers', 'quotes'))
     id_to_tokens = {i: tokenize_doc(doc) for i, doc in enumerate(dataset['data'])}
+
+    nlp = spacy.load('en_core_web_sm', disable=['parser', 'textcat'])
+    doc_list = {i: nlp(article) for i, article in enumerate(dataset['data'])}
 
     # Remove articles whose content is 'blah blah blah'
     extra_words = ['maxaxaxaxaxaxaxaxaxaxaxaxaxaxax', 'said', 'also', 'would', 'get', 'say', 'go', 'do', 'one']

@@ -18,7 +18,8 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
     unique_words = get_unique_words(iden_to_tokens.values())
     W = len(unique_words)
 
-    for _ in range(niter):  # One iteration of Gibbs sampler
+    for i in range(niter):  # One iteration of Gibbs sampler
+        print(f'Running iteration {i} out of {niter}')
         for doc, words in iden_to_tokens.items():
             for i, word in enumerate(words):
                 densities = np.zeros(K)

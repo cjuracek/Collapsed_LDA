@@ -15,7 +15,9 @@ if __name__ == '__main__':
 
     # Process the articles with spaCy
     nlp = spacy.load('en_core_web_sm', disable=['parser', 'textcat', 'ner'])
+    print('Running spaCy processing')
     id_to_tokens = {i: nlp(article) for i, article in enumerate(dataset['data'])}
+    print('Done processing')
 
     # Remove the stop words and lemmatize
     id_to_tokens = {i: preprocess_spacy_doc(article, STOP_WORDS) for i, article in id_to_tokens.items()}
@@ -28,6 +30,7 @@ if __name__ == '__main__':
     vocabulary = get_unique_words(id_to_tokens.values())
 
     # Run LDA
+    print('RUNNING LDA')
     start_time = perf_counter()
     topic, phi, theta = LatentDirichletAllocation(id_to_tokens, K=20, alpha=2/20, niter=10)
     end_time = perf_counter()

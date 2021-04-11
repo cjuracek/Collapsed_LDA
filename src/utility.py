@@ -1,6 +1,7 @@
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 import string
 
 
@@ -78,3 +79,25 @@ def stem_tokens(tokens):
     ps = PorterStemmer()
     tokens_stemmed = [ps.stem(token) for token in tokens]
     return tokens_stemmed
+
+
+# Remove stop words and lemmatize
+def preprocess_spacy_doc(doc, stop_words):
+    # Get all lowercased lemmas from document
+    lemmas = [token.lemma_.lower() for token in doc if token.text.isalpha()]
+
+    # Remove all stop words / lemmas that are too short
+    lemmas = [lemma for lemma in lemmas if lemma not in stop_words and len(lemma) > 2]
+    return lemmas
+
+
+# Filter out rare tokens. Per Porteous the vocabulary was filtered
+# "only keeping words that occurred more than ten times"
+def filter_extremes(docs, vocabulary, more_than=10):
+
+    # Take words that appear more than "more than" times
+    good_words = [word for word in tqdm(vocabulary)
+                  if more_than < sum([word in doc for doc in docs])]
+
+    tokens = [[word for word in doc if word in good_words] for doc in docs]
+    return tokens

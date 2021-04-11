@@ -18,7 +18,8 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
     unique_words = get_unique_words(iden_to_tokens.values())
     W = len(unique_words)
 
-    for _ in range(niter):  # One iteration of Gibbs sampler
+    for j in range(niter):  # One iteration of Gibbs sampler
+        print(f'Running iteration {j + 1} out of {niter}')
         for doc, words in iden_to_tokens.items():
             for i, word in enumerate(words):
                 densities = np.zeros(K)
@@ -60,7 +61,10 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
                 total_topic_counts[curr_topic] -= 1
                 total_topic_counts[new_topic] += 1
 
+    # Determine topic for word from the chain
     document_word_topics = compute_MC_topic_approx(document_word_topics_MC)
+
+    # Estimate other model parameters we are interested in
     phi_matrix = compute_phi_estimates(word_topic_counts, total_topic_counts, K, unique_words, beta)
     theta_matrix = compute_theta_estimates(document_topic_counts, K, alpha)
 

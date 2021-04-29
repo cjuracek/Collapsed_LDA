@@ -1,6 +1,7 @@
 # Implement LDA with collapsed gibbs sampling on the 20NewsGroup dataset
 from src.utility import *
-from src.sampler import LatentDirichletAllocation, get_unique_words
+from src.sampler import LatentDirichletAllocation
+from src.utility import get_unique_words
 from src.inference import *
 from sklearn.datasets import fetch_20newsgroups
 from time import perf_counter

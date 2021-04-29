@@ -2,6 +2,8 @@ import numpy as np
 from random import choices
 from scipy import stats
 
+from src.utility import get_unique_words
+
 
 def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
     """ Perform collapsed Gibbs sampling to discover latent topics in corpus
@@ -164,13 +166,3 @@ def compute_theta_estimates(document_topic_counts, K, alpha):
 
     return theta_matrix
 
-def get_unique_words(tokens):
-    """
-    Provide a list of unique tokens present in the list tokens
-
-    :param tokens: List of lists containing all of the tokens in the corpus
-    :return: A list of all the unique tokens in the corpus
-    """
-    
-    unique_words = set().union(*tokens)
-    return list(unique_words)

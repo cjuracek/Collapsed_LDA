@@ -1,9 +1,8 @@
 # This file tests test some of the functions we made to make sure they return what is expected of them
 
-from src.sampler import *
 from src.utility import *
 from src.inference import *
-
+from src.utility import get_unique_words
 
 if __name__ == "__main__":
 

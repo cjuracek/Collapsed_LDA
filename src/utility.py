@@ -101,3 +101,15 @@ def filter_extremes(docs, vocabulary, more_than=10):
 
     tokens = [[word for word in doc if word in good_words] for doc in docs]
     return tokens
+
+
+def get_unique_words(tokens):
+    """
+    Provide a list of unique tokens present in the list tokens
+
+    :param tokens: List of lists containing all of the tokens in the corpus
+    :return: A list of all the unique tokens in the corpus
+    """
+
+    unique_words = set().union(*tokens)
+    return list(unique_words)

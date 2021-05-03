@@ -78,10 +78,11 @@ class LatentDirichletAllocation:
         document_word_topics = self._compute_MC_topic_approx(document_word_topics_MC)
 
         # Estimate other model parameters we are interested in
-        phi_matrix = _compute_phi_estimates(word_topic_counts, total_topic_counts, beta)
-        theta_matrix = compute_theta_estimates(document_topic_counts, K, alpha)
+        self._compute_phi_estimates(word_topic_counts, total_topic_counts, beta)
+        self._compute_theta_estimates(document_topic_counts)
 
-        return document_word_topics, phi_matrix, theta_matrix
+        #return document_word_topics, phi_matrix, theta_matrix
+        return self
 
     def _compute_phi_estimates(self, word_topic_counts, total_topic_counts):
         """
@@ -97,6 +98,18 @@ class LatentDirichletAllocation:
                 N_k = total_topic_counts[k]
 
                 self.phi_matrix[k - 1, w] = (N_wk + self.beta) / (N_k + self.W * self.beta)
+
+    def _compute_theta_estimates(self, document_topic_counts):
+        """
+       Compute a matrix containing the mixture components of each document
+
+       :param document_topic_counts: A dictionary mapping titles to topic counts in that document
+       """
+        for j, (doc, topics) in enumerate(document_topic_counts.items()):
+            for topic in topics:
+                N_kj = document_topic_counts[doc][topic]
+                N_j = sum(document_topic_counts[doc].values())
+                self.theta_matrix[topic - 1, j] = (N_kj + self.alpha) / (N_j + self.K * self.alpha)
 
     def _initialize_topics(self):
         """

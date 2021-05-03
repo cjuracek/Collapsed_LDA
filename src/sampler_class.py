@@ -36,7 +36,7 @@ class LatentDirichletAllocation:
                     curr_topic = document_word_topics_MC[doc][i][-1]  # Get most recent topic of MC chain
 
                     # Calculate probability that a given latent topic z_ij belongs to topic k for each k
-                    for k in range(1, self.K + 1):
+                    for k in range(self.K):
 
                         # Relevant counts needed for computation - see paragraph before Eq. 1
                         N_kj = document_topic_counts[doc][k]
@@ -52,10 +52,10 @@ class LatentDirichletAllocation:
                         # Eq. 1
                         a_kj = N_kj + self.alpha
                         b_wk = (N_wk + self.beta) / (N_k + self.W * self.beta)
-                        densities[k - 1] = a_kj * b_wk
+                        densities[k] = a_kj * b_wk
 
                     # Draw a new topic and append to MC - normalization not needed
-                    new_topic = choices(range(1, self.K + 1), weights=densities)[0]
+                    new_topic = choices(range(self.K), weights=densities)[0]
                     document_word_topics_MC[doc][i].append(new_topic)
 
                     # No need to update counts if topic is the same
@@ -89,11 +89,11 @@ class LatentDirichletAllocation:
         """
 
         for w, word in enumerate(self.vocabulary):
-            for k in range(1, self.K + 1):
+            for k in range(self.K):
                 N_wk = word_topic_counts[word][k]
                 N_k = total_topic_counts[k]
 
-                self.phi_matrix[k - 1, w] = (N_wk + self.beta) / (N_k + self.W * self.beta)
+                self.phi_matrix[k, w] = (N_wk + self.beta) / (N_k + self.W * self.beta)
 
     def _compute_theta_estimates(self, document_topic_counts):
         """
@@ -105,7 +105,7 @@ class LatentDirichletAllocation:
             for topic in topics:
                 N_kj = document_topic_counts[doc][topic]
                 N_j = sum(document_topic_counts[doc].values())
-                self.theta_matrix[topic - 1, j] = (N_kj + self.alpha) / (N_j + self.K * self.alpha)
+                self.theta_matrix[topic, j] = (N_kj + self.alpha) / (N_j + self.K * self.alpha)
 
     def _initialize_topics(self):
         """
@@ -129,7 +129,7 @@ class LatentDirichletAllocation:
         for doc, words in self.iden_to_tokens.items():
 
             # Start with randomly assigned topics - update appropriate counts
-            topics = np.random.randint(low=1, high=self.K + 1, size=len(words))
+            topics = np.random.randint(low=0, high=self.K, size=len(words))
             document_word_topics_MC[doc] = [[topic] for topic in topics]
             document_topic_counts[doc].update(topics)
             total_topic_counts.update(topics)
@@ -175,8 +175,8 @@ class LatentDirichletAllocation:
             if return_probs:
                 top_n_probs = self.phi_matrix[k, top_n_idx]
                 top_n_probs = np.around(top_n_probs, 4)
-                topic_top_words[k + 1] = [(word, prob) for word, prob in zip(top_n_words, top_n_probs)]
+                topic_top_words[k] = [(word, prob) for word, prob in zip(top_n_words, top_n_probs)]
             else:
-                topic_top_words[k + 1] = top_n_words
+                topic_top_words[k] = top_n_words
 
         return topic_top_words

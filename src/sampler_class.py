@@ -158,6 +158,13 @@ class LatentDirichletAllocation:
         self.document_word_topics = document_word_topics
 
     def get_top_n_words(self, n, return_probs=False):
+        """
+        Calculate the top n words with highest posterior probability for every topic
+
+        :param n: Top number of words to find
+        :param return_probs: Should we return probabilities with these words?
+        :return: A dictionary mapping topics to the respective top words
+        """
         topic_top_words = {}
 
         for k in range(self.phi_matrix.shape[0]):

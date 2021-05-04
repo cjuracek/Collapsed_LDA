@@ -31,8 +31,6 @@ if __name__ == '__main__':
     # TODO
     #   Filter id_to_tokens
     #   Save processed spaCy docs
-    #   Save results of LDA to file
-    #   Consider making an LDA class
 
     unique_words = set().union(*id_to_tokens.values())
     vocabulary = list(unique_words)

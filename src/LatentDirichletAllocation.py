@@ -78,7 +78,6 @@ class LatentDirichletAllocation:
         # Estimate other model parameters we are interested in
         self._compute_phi_estimates(word_topic_counts, total_topic_counts)
         self._compute_theta_estimates(document_topic_counts)
-        return self
 
     def _compute_phi_estimates(self, word_topic_counts, total_topic_counts):
         """

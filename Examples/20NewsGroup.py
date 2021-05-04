@@ -1,5 +1,4 @@
 from src.utility import *
-from src.inference import *
 from src.LatentDirichletAllocation import LatentDirichletAllocation
 
 from time import perf_counter
@@ -14,7 +13,7 @@ if __name__ == '__main__':
     # With version of sklearn below .22
     dataset = fetch_20newsgroups(shuffle=True, random_state=1, remove=('headers', 'footers', 'quotes'))
 
-    # Remove space-only documents
+    # Remove empty / white space documents
     non_empty_data = [article for article in dataset['data'][:100] if article and not article.isspace()]
 
     # Process the articles with spaCy (tokenization only needed)

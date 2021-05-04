@@ -1,5 +1,6 @@
 from src.utility import *
-from src.sampler import LatentDirichletAllocation, get_unique_words
+from src.sampler import LatentDirichletAllocation
+from src.utility import get_unique_words
 from src.inference import *
 from time import time
 

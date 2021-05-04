@@ -1,14 +1,13 @@
-# Implement LDA with collapsed gibbs sampling on the 20NewsGroup dataset
 from src.utility import *
-from src.sampler import LatentDirichletAllocation
-from src.utility import get_unique_words
 from src.inference import *
-from sklearn.datasets import fetch_20newsgroups
+from src.LatentDirichletAllocation import LatentDirichletAllocation
+
 from time import perf_counter
 from tqdm import tqdm
 
 import spacy
 from spacy.lang.en.stop_words import STOP_WORDS
+from sklearn.datasets import fetch_20newsgroups
 
 if __name__ == '__main__':
 
@@ -28,10 +27,6 @@ if __name__ == '__main__':
     STOP_WORDS.update(['think', 'know', 'people', 'like', 'thing', 'good', 'use', 'come'])
     id_to_tokens = {i: preprocess_spacy_doc(article, STOP_WORDS) for i, article in id_to_tokens.items()}
 
-    # TODO
-    #   Filter id_to_tokens
-    #   Save processed spaCy docs
-
     unique_words = set().union(*id_to_tokens.values())
     vocabulary = list(unique_words)
 
@@ -44,7 +39,8 @@ if __name__ == '__main__':
     # Run LDA
     print('RUNNING LDA')
     start_time = perf_counter()
-    topic, phi, theta = LatentDirichletAllocation(id_to_filtered, K=20, alpha=2 / 20, niter=10)
+    lda = LatentDirichletAllocation(iden_to_tokens=id_to_filtered, K=20, alpha=2 / 20)
+    lda.fit(niter=10)
     end_time = perf_counter()
     print(f'Done in {(end_time - start_time):.2f}')
-    print(get_top_n_words(phi, 5, vocabulary))
+    print(lda.get_top_n_words(5))

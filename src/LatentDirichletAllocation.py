@@ -10,7 +10,7 @@ from scipy.stats import mode
 
 class LatentDirichletAllocation:
 
-    def __init__(self, iden_to_tokens, K, alpha, beta):
+    def __init__(self, iden_to_tokens, K, alpha, beta=0.01):
         self.iden_to_tokens = iden_to_tokens
         self.K = K
         self.alpha = alpha

@@ -5,11 +5,11 @@
 # License: BSD 3 clause
 from time import time
 
+from Comparisons.print_sklearn import *
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
-from Comparisons.print_sklearn import *
 from src.utility import *
 
 n_samples = 10

@@ -4,10 +4,10 @@
 #      Chyi-Kwei Yau
 from time import time
 
+from Comparisons.print_sklearn import *
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
-from Comparisons.print_sklearn import *
 from src.utility import *
 
 if __name__ == "__main__":

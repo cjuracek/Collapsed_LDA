@@ -1,15 +1,14 @@
 from collections import Counter
 from random import choices
 
-from src.utility import get_unique_words
-
 import numpy as np
-from tqdm import trange
 from scipy.stats import mode
+from tqdm import trange
+
+from src.utility import get_unique_words
 
 
 class LatentDirichletAllocation:
-
     def __init__(self, iden_to_tokens, K, alpha, beta=0.01):
         self.iden_to_tokens = iden_to_tokens
         self.K = K
@@ -21,23 +20,29 @@ class LatentDirichletAllocation:
         self.phi_matrix = np.zeros((K, self.W))
 
     def fit(self, niter):
-        """ Perform collapsed Gibbs sampling to discover latent topics in corpus
+        """Perform collapsed Gibbs sampling to discover latent topics in corpus
 
         :param niter: Number of iterations to run the Gibbs sampler for
         """
 
-        document_word_topics_MC, document_topic_counts, word_topic_counts, total_topic_counts = self._initialize_topics()
+        (
+            document_word_topics_MC,
+            document_topic_counts,
+            word_topic_counts,
+            total_topic_counts,
+        ) = self._initialize_topics()
 
         for j in trange(niter):  # One iteration of Gibbs sampler
-            print(f'Running iteration {j + 1} out of {niter}')
+            print(f"Running iteration {j + 1} out of {niter}")
             for doc, words in self.iden_to_tokens.items():
                 for i, word in enumerate(words):
                     densities = np.zeros(self.K)
-                    curr_topic = document_word_topics_MC[doc][i][-1]  # Get most recent topic of MC chain
+                    curr_topic = document_word_topics_MC[doc][i][
+                        -1
+                    ]  # Get most recent topic of MC chain
 
                     # Calculate probability that a given latent topic z_ij belongs to topic k for each k
                     for k in range(self.K):
-
                         # Relevant counts needed for computation - see paragraph before Eq. 1
                         N_kj = document_topic_counts[doc][k]
                         N_wk = word_topic_counts[word][k]
@@ -96,15 +101,17 @@ class LatentDirichletAllocation:
 
     def _compute_theta_estimates(self, document_topic_counts):
         """
-       Compute a matrix containing the mixture components of each document
+        Compute a matrix containing the mixture components of each document
 
-       :param document_topic_counts: A dictionary mapping titles to topic counts in that document
-       """
+        :param document_topic_counts: A dictionary mapping titles to topic counts in that document
+        """
         for j, (doc, topics) in enumerate(document_topic_counts.items()):
             for topic in topics:
                 N_kj = document_topic_counts[doc][topic]
                 N_j = sum(document_topic_counts[doc].values())
-                self.theta_matrix[topic, j] = (N_kj + self.alpha) / (N_j + self.K * self.alpha)
+                self.theta_matrix[topic, j] = (N_kj + self.alpha) / (
+                    N_j + self.K * self.alpha
+                )
 
     def _initialize_topics(self):
         """
@@ -117,7 +124,9 @@ class LatentDirichletAllocation:
         document_word_topics_MC = {}
 
         # Counts of each topic per document (Dict of dicts)
-        document_topic_counts = {title: Counter() for title in self.iden_to_tokens.keys()}
+        document_topic_counts = {
+            title: Counter() for title in self.iden_to_tokens.keys()
+        }
 
         # Counts number of times a given word is assigned to each topic (dict of dicts)
         word_topic_counts = {word: Counter() for word in self.vocabulary}
@@ -126,7 +135,6 @@ class LatentDirichletAllocation:
         total_topic_counts = Counter()
 
         for doc, words in self.iden_to_tokens.items():
-
             # Start with randomly assigned topics - update appropriate counts
             topics = np.random.randint(low=0, high=self.K, size=len(words))
             document_word_topics_MC[doc] = [[topic] for topic in topics]
@@ -135,10 +143,19 @@ class LatentDirichletAllocation:
 
             # Update the topic counts per word
             for unique_word in set(words):
-                unique_word_topics = [topic for idx, topic in enumerate(topics) if words[idx] == unique_word]
+                unique_word_topics = [
+                    topic
+                    for idx, topic in enumerate(topics)
+                    if words[idx] == unique_word
+                ]
                 word_topic_counts[unique_word].update(unique_word_topics)
 
-        return document_word_topics_MC, document_topic_counts, word_topic_counts, total_topic_counts
+        return (
+            document_word_topics_MC,
+            document_topic_counts,
+            word_topic_counts,
+            total_topic_counts,
+        )
 
     def _compute_MC_topic_approx(self, document_word_topics_MC):
         """
@@ -151,7 +168,9 @@ class LatentDirichletAllocation:
         document_word_topics = {title: [] for title in document_word_topics_MC.keys()}
         for doc, words in document_word_topics_MC.items():
             for i, word in enumerate(words):
-                most_frequent_topic = mode(document_word_topics_MC[doc][i], axis=None)[0][0]
+                most_frequent_topic = mode(document_word_topics_MC[doc][i], axis=None)[
+                    0
+                ][0]
                 document_word_topics[doc].append(most_frequent_topic)
 
         self.document_word_topics = document_word_topics
@@ -174,7 +193,9 @@ class LatentDirichletAllocation:
             if return_probs:
                 top_n_probs = self.phi_matrix[k, top_n_idx]
                 top_n_probs = np.around(top_n_probs, 4)
-                topic_top_words[k] = [(word, prob) for word, prob in zip(top_n_words, top_n_probs)]
+                topic_top_words[k] = [
+                    (word, prob) for word, prob in zip(top_n_words, top_n_probs)
+                ]
             else:
                 topic_top_words[k] = top_n_words
 

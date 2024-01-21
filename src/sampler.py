@@ -1,12 +1,13 @@
-import numpy as np
 from random import choices
+
+import numpy as np
 from scipy import stats
 
 from src.utility import get_unique_words
 
 
 def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
-    """ Perform collapsed Gibbs sampling to discover latent topics in corpus
+    """Perform collapsed Gibbs sampling to discover latent topics in corpus
 
     :param iden_to_tokens: A dictionary that maps unique identifiers (titles) to their contents
     :param K: Number of topics for LDA to discover
@@ -16,12 +17,17 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
     :return: Topics per document (z), phi matrix, and theta matrix
     """
 
-    document_word_topics_MC, document_topic_counts, word_topic_counts, total_topic_counts = initialize_topics(iden_to_tokens, K)
+    (
+        document_word_topics_MC,
+        document_topic_counts,
+        word_topic_counts,
+        total_topic_counts,
+    ) = initialize_topics(iden_to_tokens, K)
     unique_words = get_unique_words(iden_to_tokens.values())
     W = len(unique_words)
 
     for j in range(niter):  # One iteration of Gibbs sampler
-        print(f'Running iteration {j + 1} out of {niter}')
+        print(f"Running iteration {j + 1} out of {niter}")
         for doc, words in iden_to_tokens.items():
             for i, word in enumerate(words):
                 densities = np.zeros(K)
@@ -52,7 +58,7 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
                     continue
 
                 # Update counts
-                #document_word_topics[doc][i] = new_topic
+                # document_word_topics[doc][i] = new_topic
 
                 document_topic_counts[doc][curr_topic] -= 1
                 document_topic_counts[doc][new_topic] += 1
@@ -67,7 +73,9 @@ def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):
     document_word_topics = compute_MC_topic_approx(document_word_topics_MC)
 
     # Estimate other model parameters we are interested in
-    phi_matrix = compute_phi_estimates(word_topic_counts, total_topic_counts, K, unique_words, beta)
+    phi_matrix = compute_phi_estimates(
+        word_topic_counts, total_topic_counts, K, unique_words, beta
+    )
     theta_matrix = compute_theta_estimates(document_topic_counts, K, alpha)
 
     return document_word_topics, phi_matrix, theta_matrix
@@ -81,16 +89,20 @@ def initialize_topics(iden_to_tokens, K):
     :param K: Number of choices of topics
     :return: 4 dictionaries of counts (see comments below)
     """
-    
+
     # Contains the ordered list of topics for each document (Dict of lists)
     document_word_topics_MC = {title: [] for title in iden_to_tokens.keys()}
 
     # Counts of each topic per document (Dict of dicts)
-    document_topic_counts = {title: dict.fromkeys(range(1, K + 1), 0) for title in iden_to_tokens.keys()}
+    document_topic_counts = {
+        title: dict.fromkeys(range(1, K + 1), 0) for title in iden_to_tokens.keys()
+    }
 
     unique_words = get_unique_words(iden_to_tokens.values())
     # Counts of each topic per word (dict of dicts)
-    word_topic_counts = {word: dict.fromkeys(range(1, K + 1), 0) for word in unique_words}
+    word_topic_counts = {
+        word: dict.fromkeys(range(1, K + 1), 0) for word in unique_words
+    }
 
     # Counts of each topic across all documents
     total_topic_counts = dict.fromkeys(range(1, K + 1), 0)
@@ -99,25 +111,34 @@ def initialize_topics(iden_to_tokens, K):
         for i, word in enumerate(words):
             topic = np.random.randint(1, K + 1)
             document_word_topics_MC[doc].append([topic])
-            document_topic_counts[doc][topic] = document_topic_counts[doc].get(topic, 0) + 1
+            document_topic_counts[doc][topic] = (
+                document_topic_counts[doc].get(topic, 0) + 1
+            )
             word_topic_counts[word][topic] = word_topic_counts[word].get(topic, 0) + 1
             total_topic_counts[topic] = total_topic_counts[topic] + 1
 
-    return document_word_topics_MC, document_topic_counts, word_topic_counts, total_topic_counts
+    return (
+        document_word_topics_MC,
+        document_topic_counts,
+        word_topic_counts,
+        total_topic_counts,
+    )
 
 
 def compute_MC_topic_approx(document_word_topics_MC):
     """
     Given a Markov chain of word topics, compute a Monte Carlo approximation by picking mode of topics
-    
+
     :param document_word_topics: Dictionary that maps identifiers (titles) to a Markov chain of their topics
     :return: Dictionary that maps identifiers (titles) to the Monte Carlo approx of their topics (mode)
     """
-    
+
     document_word_topics = {title: [] for title in document_word_topics_MC.keys()}
     for doc, words in document_word_topics_MC.items():
         for i, word in enumerate(words):
-            document_word_topics[doc].append(stats.mode(document_word_topics_MC[doc][i], axis=None)[0][0])
+            document_word_topics[doc].append(
+                stats.mode(document_word_topics_MC[doc][i], axis=None)[0][0]
+            )
 
     return document_word_topics
 
@@ -133,7 +154,7 @@ def compute_phi_estimates(word_topic_counts, total_topic_counts, K, unique_words
     :param beta: Hyperparameter controlling sparsity of word distributions per topic
     :return: (K x W) matrix of word probability per topic
     """
-    
+
     W = len(unique_words)
     phi_matrix = np.zeros((K, W))
 
@@ -156,7 +177,7 @@ def compute_theta_estimates(document_topic_counts, K, alpha):
     :param alpha: Determines sparsity of topic distributions per document
     :return: A (K x D) NumPy array of mixture distributions per document
     """
-    
+
     theta_matrix = np.zeros((K, len(document_topic_counts)))
     for j, (doc, topics) in enumerate(document_topic_counts.items()):
         for topic in topics:
@@ -165,4 +186,3 @@ def compute_theta_estimates(document_topic_counts, K, alpha):
             theta_matrix[topic - 1, j] = (N_kj + alpha) / (N_j + K * alpha)
 
     return theta_matrix
-

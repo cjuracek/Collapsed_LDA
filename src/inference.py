@@ -12,7 +12,9 @@ def get_top_n_words(phi_matrix, n, unique_words, return_probs=False):
         if return_probs:
             top_n_probs = phi_matrix[k, top_n_idx]
             top_n_probs = np.around(top_n_probs, 4)
-            topic_top_words[k + 1] = [(word, prob) for word, prob in zip(top_n_words, top_n_probs)]
+            topic_top_words[k + 1] = [
+                (word, prob) for word, prob in zip(top_n_words, top_n_probs)
+            ]
         else:
             topic_top_words[k + 1] = top_n_words
 

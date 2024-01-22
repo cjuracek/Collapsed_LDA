@@ -1,6 +1,6 @@
 # This file tests test some of the functions we made to make sure they return what is expected of them
 
-from src.inference import *
+from src.lda.inference import *
 from src.utility import *
 from src.utility import get_unique_words
 

@@ -2,12 +2,9 @@
 from pprint import pprint
 from time import time
 
-# ! pip install gensim
-import gensim
-import gensim.corpora as corpora
-from Comparisons.func_gensim import *
 from sklearn.datasets import fetch_20newsgroups
 
+from src.comparisons.func_gensim import *
 from src.utility import *
 
 if __name__ == "__main__":

@@ -2,7 +2,10 @@
 name = "collapsed-lda"
 version = "1.0.0"
 description = "Implementation of collapsed Gibbs sampling for Latent Dirichlet Allocation (LDA)"
-authors = ["Cole Juracek <therealjuracek@gmail.com>, Pierre Gardan"]
+authors = [
+    "Cole Juracek <therealjuracek@gmail.com>",
+    "Pierre Gardan <p.gardan@gmail.com>"
+]
 readme = "README.md"
 
 [tool.poetry.dependencies]

@@ -3,7 +3,7 @@ from random import choices
 import numpy as np
 from scipy import stats
 
-from src.utility import get_unique_words
+from collapsed_lda.utility import get_unique_words
 
 
 def LatentDirichletAllocation(iden_to_tokens, K, alpha, niter, beta=0.01):

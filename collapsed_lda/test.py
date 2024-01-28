@@ -1,8 +1,8 @@
 # This file tests test some of the functions we made to make sure they return what is expected of them
 
-from src.inference import *
-from src.utility import *
-from src.utility import get_unique_words
+from collapsed_lda.lda.inference import *
+from collapsed_lda.utility import *
+from collapsed_lda.utility import get_unique_words
 
 if __name__ == "__main__":
     # Testing unique words

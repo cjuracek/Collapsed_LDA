@@ -5,7 +5,7 @@ import numpy as np
 from scipy.stats import mode
 from tqdm import trange
 
-from src.utility import get_unique_words
+from collapsed_lda.utility import get_unique_words
 
 
 class LatentDirichletAllocation:

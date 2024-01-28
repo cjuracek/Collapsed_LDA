@@ -19,6 +19,13 @@ Project installation can also be done with pip. Run:
 
 It is recommended to install the project requirements into a project-specific virtual environment.
 
+### Additional Steps
+
+In addition to the project dependencies, an additional `spaCy` model needs to be downloaded. Instructions are located 
+[here](https://spacy.io/usage/models#quickstart), although it's only a one-line command:
+
+```python -m spacy download en_core_web_sm```
+
 
 ### - The detailed code can be found in document src 
 The sampler file containing the actual function for the gibbs sampler. The utility file contains functions to prepare the data into usable tokens and titles while inference is made of only one function to print top words. The test file tests that some of our functions return the desired output

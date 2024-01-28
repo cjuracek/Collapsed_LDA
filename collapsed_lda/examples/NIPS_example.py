@@ -3,8 +3,9 @@ from time import time
 
 import numpy as np
 import pandas as pd
-from src.lda.inference import get_top_n_words
-from src.lda.sampler import LatentDirichletAllocation
+
+from collapsed_lda.lda.inference import get_top_n_words
+from collapsed_lda.lda.sampler import LatentDirichletAllocation
 
 if __name__ == "__main__":
     zf = zipfile.ZipFile("../Data/NIPS_1987-2015.csv.zip")

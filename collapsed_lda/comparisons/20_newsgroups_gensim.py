@@ -3,8 +3,9 @@ from pprint import pprint
 from time import time
 
 from sklearn.datasets import fetch_20newsgroups
-from src.comparisons.func_gensim import *
-from src.utility import *
+
+from collapsed_lda.comparisons.func_gensim import *
+from collapsed_lda.utility import *
 
 if __name__ == "__main__":
     K = 20

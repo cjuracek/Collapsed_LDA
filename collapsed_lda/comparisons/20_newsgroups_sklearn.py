@@ -9,7 +9,8 @@ from Comparisons.print_sklearn import *
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from src.utility import *
+
+from collapsed_lda.utility import *
 
 n_samples = 10
 n_topics = 20

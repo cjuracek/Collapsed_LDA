@@ -1,9 +1,9 @@
 from time import time
 
-from src.lda.inference import *
-from src.lda.sampler import LatentDirichletAllocation
-from src.utility import *
-from src.utility import get_unique_words
+from collapsed_lda.lda.inference import *
+from collapsed_lda.lda.sampler import LatentDirichletAllocation
+from collapsed_lda.utility import *
+from collapsed_lda.utility import get_unique_words
 
 if __name__ == "__main__":
     with open("../Data/reuters21578/reut2-000.sgm") as f:

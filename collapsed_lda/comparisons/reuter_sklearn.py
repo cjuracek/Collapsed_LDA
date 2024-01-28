@@ -7,7 +7,8 @@ from time import time
 from Comparisons.print_sklearn import *
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
-from src.utility import *
+
+from collapsed_lda.utility import *
 
 if __name__ == "__main__":
     n_topics = 5

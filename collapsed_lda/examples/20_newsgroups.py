@@ -3,9 +3,10 @@ from time import perf_counter
 import spacy
 from sklearn.datasets import fetch_20newsgroups
 from spacy.lang.en.stop_words import STOP_WORDS
-from src.LatentDirichletAllocation import LatentDirichletAllocation
-from src.utility import *
 from tqdm import tqdm
+
+from collapsed_lda.LatentDirichletAllocation import LatentDirichletAllocation
+from collapsed_lda.utility import *
 
 if __name__ == "__main__":
     # With version of sklearn below .22

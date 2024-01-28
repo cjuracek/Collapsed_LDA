@@ -3,8 +3,9 @@ from random import choices
 
 import numpy as np
 from scipy.stats import mode
-from src.utility import get_unique_words
 from tqdm import trange
+
+from collapsed_lda.utility import get_unique_words
 
 
 class LatentDirichletAllocation:

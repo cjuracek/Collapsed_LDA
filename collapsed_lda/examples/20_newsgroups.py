@@ -10,11 +10,11 @@ from collapsed_lda.lda.latent_dirichlet_allocation import \
 from collapsed_lda.utility import *
 
 if __name__ == "__main__":
-    print("Loading data from 20 newsgroups dataset...", end="")
+    print("Loading data from 20 newsgroups dataset... ", end="")
     dataset = fetch_20newsgroups(
         shuffle=True, random_state=1, remove=("headers", "footers", "quotes")
     )
-    print("Done")
+    print(f"Done. Loaded {len(dataset.data)} items")
 
     # Remove empty / white space documents
     non_empty_data = [

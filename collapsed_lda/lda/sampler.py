@@ -1,7 +1,6 @@
 from random import choices
 
 import numpy as np
-from scipy import stats
 
 from collapsed_lda.utility import get_unique_words
 

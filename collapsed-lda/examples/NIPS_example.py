@@ -3,7 +3,6 @@ from time import time
 
 import numpy as np
 import pandas as pd
-
 from src.lda.inference import get_top_n_words
 from src.lda.sampler import LatentDirichletAllocation
 

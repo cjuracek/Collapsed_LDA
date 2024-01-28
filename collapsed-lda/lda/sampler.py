@@ -2,7 +2,6 @@ from random import choices
 
 import numpy as np
 from scipy import stats
-
 from src.utility import get_unique_words
 
 

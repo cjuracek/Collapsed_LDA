@@ -3,7 +3,6 @@ from pprint import pprint
 from time import time
 
 from sklearn.datasets import fetch_20newsgroups
-
 from src.comparisons.func_gensim import *
 from src.utility import *
 

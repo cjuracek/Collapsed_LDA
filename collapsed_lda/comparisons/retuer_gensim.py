@@ -5,9 +5,9 @@ from time import time
 # ! pip install gensim
 import gensim
 import gensim.corpora as corpora
-from Comparisons.func_gensim import *
 from sklearn.datasets import fetch_20newsgroups
 
+from collapsed_lda.comparisons.func_gensim import *
 from collapsed_lda.utility import *
 
 if __name__ == "__main__":

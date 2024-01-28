@@ -5,7 +5,8 @@ from sklearn.datasets import fetch_20newsgroups
 from spacy.lang.en.stop_words import STOP_WORDS
 from tqdm import tqdm
 
-from collapsed_lda.LatentDirichletAllocation import LatentDirichletAllocation
+from collapsed_lda.lda.latent_dirichlet_allocation import \
+    LatentDirichletAllocation
 from collapsed_lda.utility import *
 
 if __name__ == "__main__":

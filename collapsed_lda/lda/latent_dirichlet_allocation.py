@@ -1,8 +1,8 @@
 from collections import Counter
 from random import choices
+from statistics import mode
 
 import numpy as np
-from scipy.stats import mode
 from tqdm import trange
 
 from collapsed_lda.utility import get_unique_words
@@ -35,9 +35,9 @@ class LatentDirichletAllocation:
         for j in trange(niter):  # One iteration of Gibbs sampler
             print(f"Running iteration {j + 1} out of {niter}")
             for doc, words in self.iden_to_tokens.items():
-                for i, word in enumerate(words):
+                for word_idx, word in enumerate(words):
                     densities = np.zeros(self.K)
-                    curr_topic = document_word_topics_MC[doc][i][
+                    curr_topic = document_word_topics_MC[doc][word_idx][
                         -1
                     ]  # Get most recent topic of MC chain
 
@@ -61,7 +61,7 @@ class LatentDirichletAllocation:
 
                     # Draw a new topic and append to MC - normalization not needed
                     new_topic = choices(range(self.K), weights=densities)[0]
-                    document_word_topics_MC[doc][i].append(new_topic)
+                    document_word_topics_MC[doc][word_idx].append(new_topic)
 
                     # No need to update counts if topic is the same
                     if new_topic == curr_topic:
@@ -166,11 +166,12 @@ class LatentDirichletAllocation:
         """
 
         document_word_topics = {title: [] for title in document_word_topics_MC.keys()}
-        for doc, words in document_word_topics_MC.items():
-            for i, word in enumerate(words):
-                most_frequent_topic = mode(document_word_topics_MC[doc][i], axis=None)[
-                    0
-                ][0]
+
+        # Iterate through all chains in all documents
+        for doc, word_chains in document_word_topics_MC.items():
+            # Iterate through chains within individual documents
+            for word_chain in word_chains:
+                most_frequent_topic = mode(word_chain)
                 document_word_topics[doc].append(most_frequent_topic)
 
         self.document_word_topics = document_word_topics

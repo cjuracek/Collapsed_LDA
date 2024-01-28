@@ -10,16 +10,15 @@ from collapsed_lda.lda.latent_dirichlet_allocation import \
 from collapsed_lda.utility import *
 
 if __name__ == "__main__":
-    # With version of sklearn below .22
+    print("Loading data from 20 newsgroups dataset...", end="")
     dataset = fetch_20newsgroups(
         shuffle=True, random_state=1, remove=("headers", "footers", "quotes")
     )
+    print("Done")
 
     # Remove empty / white space documents
     non_empty_data = [
-        article
-        for article in dataset["data"][:100]
-        if article and not article.isspace()
+        article for article in dataset["data"] if article and not article.isspace()
     ]
 
     # Process the articles with spaCy (tokenization only needed)

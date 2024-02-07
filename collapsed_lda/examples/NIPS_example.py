@@ -1,15 +1,31 @@
 import zipfile
-from time import time
+from pathlib import Path
+from time import perf_counter
 
+import click
 import numpy as np
 import pandas as pd
 
-from collapsed_lda.lda.inference import get_top_n_words
-from collapsed_lda.lda.sampler import LatentDirichletAllocation
+from collapsed_lda.lda import LatentDirichletAllocation
 
-if __name__ == "__main__":
-    zf = zipfile.ZipFile("../Data/NIPS_1987-2015.csv.zip")
-    nips_df = pd.read_csv(zf.open("NIPS_1987-2015.csv"))
+
+@click.command()
+@click.option("--n-iter", default=10, type=int)
+@click.option("--k", default=10, type=int)
+@click.option("--data-dir", type=Path, default="./data/nips/")
+def main(n_iter, k, data_dir):
+    data_path = data_dir / "NIPS_1987-2015.csv"
+    if not data_path.exists():
+        print(f"Data path {data_path} does not exist. Extracting...", end=" ")
+        zip_path = data_path.with_suffix(".csv.zip")
+        with zipfile.ZipFile(zip_path, "r") as zip_ref:
+            zip_ref.extractall(data_path.parent)
+        print("Done")
+
+    # nips_df = pd.read_csv(zf.open("NIPS_1987-2015.csv"))
+    print("Reading data frame...", end=" ")
+    nips_df = pd.read_csv(data_path)
+    print(f"Done. Read {len(nips_df)} rows")
     nips_df_red = nips_df.iloc[:, 1:].sample(frac=0.1, axis="columns")
 
     # Data already has stop words removed
@@ -24,9 +40,16 @@ if __name__ == "__main__":
             bag_of_words += [words[i]] * nips_df_red.iloc[i, j]
         titles_to_tokens[nips_df_red.columns[j]] = bag_of_words
 
-    K = 10
-    t0 = time()
-    z, phi, theta = LatentDirichletAllocation(titles_to_tokens, K, 2 / K, niter=10)
-    print("done in %0.3fs." % (time() - t0))
+    t0 = perf_counter()
+    lda = LatentDirichletAllocation(
+        doc_to_tokens=titles_to_tokens, K=k, alpha=2 / k, beta=0.01
+    )
+    print(f"Running LDA for {n_iter} iterations...")
+    lda.fit(n_iter=n_iter)
+    t1 = perf_counter()
+    print(f"Done in {t1 - t0:.3f}s")
+    print(lda.get_top_n_words(n=5))
 
-    print(get_top_n_words(phi, 5, list(words)))
+
+if __name__ == "__main__":
+    main()

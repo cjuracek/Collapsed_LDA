@@ -37,7 +37,6 @@ class LatentDirichletAllocation:
             print(f"Running LDA for {n_iter} iterations...")
 
         for j in trange(n_iter):  # One iteration of Gibbs sampler
-            print(f"Running iteration {j + 1} out of {n_iter}")
             for doc, words in self.iden_to_tokens.items():
                 for word_idx, word in enumerate(words):
                     densities = np.zeros(self.K)

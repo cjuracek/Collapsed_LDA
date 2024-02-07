@@ -9,7 +9,7 @@ from collapsed_lda.utility import get_unique_words
 
 
 class LatentDirichletAllocation:
-    def __init__(self, doc_to_tokens, K, alpha, beta=0.01):
+    def __init__(self, doc_to_tokens, K, alpha, beta=0.01, verbose=True):
         self.iden_to_tokens = doc_to_tokens
         self.K = K
         self.alpha = alpha
@@ -18,11 +18,12 @@ class LatentDirichletAllocation:
         self.W = len(self.vocabulary)
         self.theta_matrix = np.zeros((K, len(doc_to_tokens)))
         self.phi_matrix = np.zeros((K, self.W))
+        self.verbose = verbose
 
-    def fit(self, niter):
+    def fit(self, n_iter):
         """Perform collapsed Gibbs sampling to discover latent topics in corpus
 
-        :param niter: Number of iterations to run the Gibbs sampler for
+        :param n_iter: Number of iterations to run the Gibbs sampler for
         """
 
         (
@@ -32,8 +33,11 @@ class LatentDirichletAllocation:
             total_topic_counts,
         ) = self._initialize_topics()
 
-        for j in trange(niter):  # One iteration of Gibbs sampler
-            print(f"Running iteration {j + 1} out of {niter}")
+        if self.verbose:
+            print(f"Running LDA for {n_iter} iterations...")
+
+        for j in trange(n_iter):  # One iteration of Gibbs sampler
+            print(f"Running iteration {j + 1} out of {n_iter}")
             for doc, words in self.iden_to_tokens.items():
                 for word_idx, word in enumerate(words):
                     densities = np.zeros(self.K)
@@ -119,6 +123,8 @@ class LatentDirichletAllocation:
 
         :return: 4 dictionaries of counts (see comments below)
         """
+        if self.verbose:
+            print("Initializing topics...")
 
         # Contains the ordered list of topics for each document (Dict of lists)
         document_word_topics_MC = {}

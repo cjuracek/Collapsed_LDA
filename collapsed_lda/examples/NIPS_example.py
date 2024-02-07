@@ -44,7 +44,6 @@ def main(n_iter, k, data_dir):
     lda = LatentDirichletAllocation(
         doc_to_tokens=titles_to_tokens, K=k, alpha=2 / k, beta=0.01
     )
-    print(f"Running LDA for {n_iter} iterations...")
     lda.fit(n_iter=n_iter)
     t1 = perf_counter()
     print(f"Done in {t1 - t0:.3f}s")

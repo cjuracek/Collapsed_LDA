@@ -1,25 +1,33 @@
 from time import perf_counter
 
+import click
 import spacy
 from sklearn.datasets import fetch_20newsgroups
 from spacy.lang.en.stop_words import STOP_WORDS
 from tqdm import tqdm
 
-from collapsed_lda.lda.latent_dirichlet_allocation import \
-    LatentDirichletAllocation
+from collapsed_lda.lda import LatentDirichletAllocation
 from collapsed_lda.utility import *
 
-if __name__ == "__main__":
-    # With version of sklearn below .22
+
+@click.command()
+@click.option("--fast-dev-run", is_flag=True, default=False)
+@click.option("--k", default=20, type=int)
+@click.option("--alpha", default=2 / 20, type=float)
+@click.option("--n-iter", type=int, default=10)
+def main(fast_dev_run, k, alpha, n_iter):
+    print("Loading data from 20 newsgroups dataset... ", end="")
     dataset = fetch_20newsgroups(
         shuffle=True, random_state=1, remove=("headers", "footers", "quotes")
     )
+    if fast_dev_run:
+        dataset["data"] = dataset["data"][:100]
+
+    print(f"Done. Loaded {len(dataset.data)} items")
 
     # Remove empty / white space documents
     non_empty_data = [
-        article
-        for article in dataset["data"][:100]
-        if article and not article.isspace()
+        article for article in dataset["data"] if article and not article.isspace()
     ]
 
     # Process the articles with spaCy (tokenization only needed)
@@ -43,14 +51,16 @@ if __name__ == "__main__":
     # Remove rare and overly common words from corpus
     filtered_tokens = filter_extremes(id_to_tokens.values(), vocabulary, more_than=10)
     id_to_filtered = {i: tokens for i, tokens in enumerate(filtered_tokens)}
-    unique_words = set().union(*id_to_filtered.values())
-    vocabulary = list(unique_words)
 
     # Run LDA
     print("RUNNING LDA")
     start_time = perf_counter()
-    lda = LatentDirichletAllocation(iden_to_tokens=id_to_filtered, K=20, alpha=2 / 20)
-    lda.fit(niter=10)
+    lda = LatentDirichletAllocation(doc_to_tokens=id_to_filtered, K=k, alpha=alpha)
+    lda.fit(n_iter=n_iter)
     end_time = perf_counter()
     print(f"Done in {(end_time - start_time):.2f}")
     print(lda.get_top_n_words(5))
+
+
+if __name__ == "__main__":
+    main()

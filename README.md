@@ -21,10 +21,12 @@ It is recommended to install the project requirements into a project-specific vi
 
 ### Additional Steps
 
-In addition to the project dependencies, an additional `spaCy` model needs to be downloaded. Instructions are located 
-[here](https://spacy.io/usage/models#quickstart), although it's only a one-line command:
+In addition to the project dependencies, additional steps need to be taken to download the language model used for parsing and
+a list of stopwords. Run
 
-```python -m spacy download en_core_web_sm```
+```make install```
+
+To handle these commands
 
 
 ### - The detailed code can be found in document src 

@@ -1,6 +1,7 @@
-# Implement gensim LDA approximation in parallele on the 20NewsGroup dataset
+"""Implement gensim LDA approximation in parallel on the 20NewsGroup dataset"""
+
 from pprint import pprint
-from time import time
+from time import perf_counter
 
 from sklearn.datasets import fetch_20newsgroups
 
@@ -9,17 +10,16 @@ from collapsed_lda.utility import *
 
 if __name__ == "__main__":
     K = 20
+    print("Fetching 20 newsgroups dataset...", end=" ")
     dataset = fetch_20newsgroups(
         shuffle=True, random_state=1, remove=("headers", "footers", "quotes")
     )
+    print("Done")
 
     data = dataset["data"]
-    # Putting each doc in an ordered dictionnary
-    title_docs = {}
-    for i in range(len(data)):
-        title_docs[i] = data[i]
+    title_docs = {i: datum for i, datum in enumerate(data)}
 
-    ##### First get the data ready similarly to our implemented example
+    # First get the data ready similarly to our implemented example
     titles_to_tokens = {title: tokenize_doc(doc) for title, doc in title_docs.items()}
 
     # Remove articles whose content is 'blah blah blah'
@@ -47,17 +47,15 @@ if __name__ == "__main__":
     docs_gen = list(titles_to_tokens_stem)  # list of document titles
     data_gen = list(titles_to_tokens_stem.values())  # list of words for each docs
 
-    ##### Second Run the algorithm
-    t0 = time()
+    # Run the algorithm
+    t0 = perf_counter()
+    print("Running LDA...")
     lda_model, corpus = gensim_lda(K, data_gen)
-    doc_n = 0
-    topic_spec_doc_gen(lda_model, corpus, doc_n)
+    topic_spec_doc_gen(lda_model, corpus, doc_n=0)
 
     doc_lda = lda_model[corpus]
-    print("done in %0.3fs." % (time() - t0))
+    t1 = perf_counter()
+    print(f"Done in {t1 - t0:.3f}s")
 
-    # Print the Keyword in each topics
+    # Print the key words in each topic
     pprint(lda_model.print_topics())
-
-    print("\nTopics proportions in Doc %s :" % docs_gen[doc_n])
-    topic_spec_doc_gen(lda_model, corpus, doc_n)

@@ -1,21 +1,19 @@
-# Implement gensim LDA approximation in parallele on the Reuter dataset
+"""Implement gensim LDA approximation in parallel on the Reuters dataset"""
 from pprint import pprint
-from time import time
+from time import perf_counter
 
-# ! pip install gensim
-import gensim
-import gensim.corpora as corpora
-from sklearn.datasets import fetch_20newsgroups
+import click
 
 from collapsed_lda.comparisons.func_gensim import *
 from collapsed_lda.utility import *
 
-if __name__ == "__main__":
-    K = 5
-    n_top_words = 10
 
-    ###### First get the data ready similarly to our implemented example
-    with open("../Data/reuters21578/reut2-000.sgm") as f:
+@click.command()
+@click.option("--k", type=int, default=5)
+@click.option("--n-top-words", type=int, default=10)
+def main(k, n_top_words):
+    # Get the data ready similarly to our implemented example
+    with open("data/reuters21578/reut2-000.sgm") as f:
         data = f.read()
 
     titles_to_articles = parse_sgm_file(data)
@@ -34,20 +32,23 @@ if __name__ == "__main__":
         title: stem_tokens(tokens) for title, tokens in titles_to_tokens.items()
     }
 
-    docs_gen = list(titles_to_tokens_stem)  # list of document titles
+    doc_titles = list(titles_to_tokens_stem)  # list of document titles
     data_gen = list(titles_to_tokens_stem.values())  # list of words for each docs
 
-    ##### Second Run the algorithm
-    t0 = time()
-    lda_model, corpus = gensim_lda(K, data_gen)
+    # Run the algorithm
+    t0 = perf_counter()
+    lda_model, corpus = gensim_lda(k, data_gen)
     doc_n = 0
-    topic_spec_doc_gen(lda_model, corpus, doc_n)
+    get_topic_distribution(lda_model, corpus, doc_n)
+    t1 = perf_counter()
+    print(f"Done in {t1 - t0:.3f}s")
 
-    doc_lda = lda_model[corpus]
-    print("done in %0.3fs." % (time() - t0))
-
-    # Print the Keyword in each topics
+    # Print the keywords in each topic
     pprint(lda_model.print_topics())
 
-    print("\nTopics proportions in Doc %s :" % docs_gen[doc_n])
-    topic_spec_doc_gen(lda_model, corpus, doc_n)
+    print(f"\nTopics proportions in Doc {doc_titles[doc_n]}:")
+    get_topic_distribution(lda_model, corpus, doc_n)
+
+
+if __name__ == "__main__":
+    main()

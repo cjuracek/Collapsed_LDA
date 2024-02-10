@@ -1,4 +1,4 @@
-"""Implement gensim LDA approximation in parallel on the Reuters dataset"""
+"""Implement gensim LDA approximation in parallel on the Reuters dataset. To be run from the repo root."""
 from pprint import pprint
 from time import perf_counter
 
@@ -32,12 +32,12 @@ def main(k, n_top_words):
         title: stem_tokens(tokens) for title, tokens in titles_to_tokens.items()
     }
 
-    doc_titles = list(titles_to_tokens_stem)  # list of document titles
-    data_gen = list(titles_to_tokens_stem.values())  # list of words for each docs
+    doc_titles = list(titles_to_tokens_stem)
+    doc_tokens = list(titles_to_tokens_stem.values())
 
     # Run the algorithm
     t0 = perf_counter()
-    lda_model, corpus = gensim_lda(k, data_gen)
+    lda_model, corpus = gensim_lda(k, doc_tokens)
     doc_n = 0
     get_topic_distribution(lda_model, corpus, doc_n)
     t1 = perf_counter()

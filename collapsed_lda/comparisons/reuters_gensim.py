@@ -4,6 +4,7 @@ from time import perf_counter
 
 import click
 
+from collapsed_lda.utility.gensim import gensim_lda, get_topic_distribution
 from collapsed_lda.utility.utility import *
 
 
@@ -45,7 +46,7 @@ def main(k, n_top_words):
     # Print the keywords in each topic
     pprint(lda_model.print_topics())
 
-    print(f"\nTopics proportions in Doc {doc_titles[doc_n]}:")
+    print(f"\nTopic distribution for Doc {doc_titles[doc_n]}:")
     get_topic_distribution(lda_model, corpus, doc_n)
 
 

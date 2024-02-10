@@ -5,8 +5,8 @@ from time import perf_counter
 
 from sklearn.datasets import fetch_20newsgroups
 
-from collapsed_lda.comparisons.func_gensim import *
-from collapsed_lda.utility import *
+from collapsed_lda.utility.gensim import gensim_lda, get_topic_distribution
+from collapsed_lda.utility.utility import *
 
 if __name__ == "__main__":
     K = 20

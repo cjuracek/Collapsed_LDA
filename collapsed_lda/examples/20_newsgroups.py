@@ -4,10 +4,9 @@ import click
 import spacy
 from sklearn.datasets import fetch_20newsgroups
 from spacy.lang.en.stop_words import STOP_WORDS
-from tqdm import tqdm
 
 from collapsed_lda.lda import LatentDirichletAllocation
-from collapsed_lda.utility import *
+from collapsed_lda.utility.utility import *
 
 
 @click.command()

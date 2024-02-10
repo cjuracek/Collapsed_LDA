@@ -12,8 +12,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
-from collapsed_lda.comparisons.print_sklearn import *
-from collapsed_lda.utility import *
+from collapsed_lda.utility.utility import *
 
 
 @click.command()

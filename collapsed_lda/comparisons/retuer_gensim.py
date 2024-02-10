@@ -4,8 +4,7 @@ from time import perf_counter
 
 import click
 
-from collapsed_lda.comparisons.func_gensim import *
-from collapsed_lda.utility import *
+from collapsed_lda.utility.utility import *
 
 
 @click.command()

@@ -2,10 +2,8 @@ import gensim
 import gensim.corpora as corpora
 
 
-def gensim_lda(K, texts):  # Create Dictionary
+def gensim_lda(K, texts):
     id2word = corpora.Dictionary(texts)
-    # Create Corpus
-
     # Term Document Frequency
     corpus_gen = [id2word.doc2bow(text) for text in texts]
 
@@ -24,9 +22,8 @@ def gensim_lda(K, texts):  # Create Dictionary
     return lda_model, corpus_gen
 
 
-def topic_spec_doc_gen(
-    lda_model, corpus, doc_n
-):  # print topic proportions for each documents
+def get_topic_distribution(lda_model, corpus, doc_n):
+    """Print topic proportions for each documents"""
     for i, row in enumerate(lda_model[corpus]):
         if i == doc_n:
             prop = row[0]  # topic proportion for doc n is in first argument of row

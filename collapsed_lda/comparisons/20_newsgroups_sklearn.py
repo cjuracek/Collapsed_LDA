@@ -1,39 +1,37 @@
-# Implement SKLEARN LatentDirichletAllocation with varitional Bayes on the 20NewsGroup dataset
-# Ref: Olivier Grisel
-#      Lars Buitinck
-#      Chyi-Kwei Yau
-# License: BSD 3 clause
+"""Implement SKLEARN LatentDirichletAllocation with variational Bayes on the 20NewsGroup dataset
+
+Load the 20 newsgroups dataset and vectorize it. We use a few heuristics
+to filter out useless terms early on. The posts are stripped of headers,
+footers, and quoted replies. Common English words, words occurring in
+only one document, and words in >= 95% of the documents are removed.
+"""
 from time import time
 
+import click
 from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
-from collapsed_lda.comparisons.print_sklearn import *
-from collapsed_lda.utility import *
-
-n_samples = 10
-n_topics = 20
+from collapsed_lda.utility.sklearn import print_top_words, topics_spec_doc
+from collapsed_lda.utility.utility import *
 
 
-# Load the 20 newsgroups dataset and vectorize it. We use a few heuristics
-# to filter out useless terms early on: the posts are stripped of headers,
-# footers and quoted replies, and common English words, words occurring in
-# only one document or in at least 95% of the documents are removed.
-
-if __name__ == "__main__":
-    # For version before .22
+@click.command()
+@click.option("--n-iter", default=10, type=int)
+@click.option("--n-topics", default=20, type=int)
+def main(n_iter, n_topics):
+    print(f"Fetching 20 newsgroups data...", end=" ")
     dataset = fetch_20newsgroups(
         shuffle=True, random_state=1, remove=("headers", "footers", "quotes")
     )
+    print("Done")
 
     data = dataset["data"]
-    # Putting each doc in an ordered dictionnary
-    title_docs = {}
-    for i in range(len(data)):
-        title_docs[i] = data[i]
-    ###### First get the data ready similarly to our implemented example
+    title_docs = {i: datum for i, datum in enumerate(data)}
+
+    # First get the data ready similarly to our implemented example
     titles_to_tokens = {title: tokenize_doc(doc) for title, doc in title_docs.items()}
+
     # Remove articles whose content is 'blah blah blah'
     extra_words = [
         "maxaxaxaxaxaxaxaxaxaxaxaxaxaxax",
@@ -57,36 +55,38 @@ if __name__ == "__main__":
 
     # Transforming the data to a list of texts according to the required format for the count vectorizer
     data_skl = list(titles_to_tokens_stem.values())
-    for i in range(len(data_skl)):
-        data_skl[i] = " ".join(
-            (data_skl[i])  # note double parens, join() takes an iterable
-        )
-    # Getting list of doc titles
-    docs_skl = list(titles_to_tokens_stem)
+    data_skl = [" ".join(doc) for doc in data_skl]
 
-    ##### Second run the algorithm
     t0 = time()
     # Use tf (raw term count) features for LDA.
     print("Extracting tf features for LDA...")
     tf_vectorizer = CountVectorizer()
-
     tf = tf_vectorizer.fit_transform(data_skl)
 
-    print("Fitting LDA models " "n_samples=%d ..." % (n_samples))
+    # Run the algorithm
+    print(f"Fitting LDA model with n_iter={n_iter}...")
     lda = LatentDirichletAllocation(
         n_components=n_topics,
-        max_iter=n_samples,
+        max_iter=n_iter,
         learning_method="online",
         random_state=0,
+        verbose=1,
     )
     lda.fit(tf)
-    print("done in %0.3fs." % (time() - t0))
+    t1 = time()
+    print(f"Done in {t1 - t0:.3f}s")
 
-    print("\nTopics in LDA model:")
-    tf_feature_names = tf_vectorizer.get_feature_names()
+    print("\nTop words by topic:")
+    tf_feature_names = tf_vectorizer.get_feature_names_out()
     n_top_words = 5
     print_top_words(lda, tf_feature_names, n_top_words)
 
-    doc_n = 0  # get topics for a given doc:
-    print("\nTopics in Doc %s :" % docs_skl[doc_n])
+    # Get topics for a sample document
+    docs_skl = list(titles_to_tokens_stem)
+    doc_n = 0
+    print(f"Topic distribution for Doc {docs_skl[doc_n]}:")
     topics_spec_doc(lda, tf, n_topics, doc_n)
+
+
+if __name__ == "__main__":
+    main()

@@ -3,7 +3,7 @@ from time import perf_counter
 import click
 
 from collapsed_lda.lda import LatentDirichletAllocation
-from collapsed_lda.utility import *
+from collapsed_lda.utility.utility import *
 
 
 @click.command()

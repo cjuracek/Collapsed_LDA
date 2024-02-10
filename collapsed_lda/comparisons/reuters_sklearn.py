@@ -9,6 +9,7 @@ import click
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
+from collapsed_lda.utility.sklearn import print_top_words, topics_spec_doc
 from collapsed_lda.utility.utility import *
 
 

@@ -12,6 +12,7 @@ from sklearn.datasets import fetch_20newsgroups
 from sklearn.decomposition import LatentDirichletAllocation
 from sklearn.feature_extraction.text import CountVectorizer
 
+from collapsed_lda.utility.sklearn import print_top_words, topics_spec_doc
 from collapsed_lda.utility.utility import *
 
 
@@ -73,9 +74,9 @@ def main(n_iter, n_topics):
     )
     lda.fit(tf)
     t1 = time()
-    print(f"Done in {t1 - t0}s")
+    print(f"Done in {t1 - t0:.3f}s")
 
-    print("\nTopics in LDA model:")
+    print("\nTop words by topic:")
     tf_feature_names = tf_vectorizer.get_feature_names_out()
     n_top_words = 5
     print_top_words(lda, tf_feature_names, n_top_words)
@@ -83,7 +84,7 @@ def main(n_iter, n_topics):
     # Get topics for a sample document
     docs_skl = list(titles_to_tokens_stem)
     doc_n = 0
-    print(f"Topics in Doc {docs_skl[doc_n]}:")
+    print(f"Topic distribution for Doc {docs_skl[doc_n]}:")
     topics_spec_doc(lda, tf, n_topics, doc_n)
 
 

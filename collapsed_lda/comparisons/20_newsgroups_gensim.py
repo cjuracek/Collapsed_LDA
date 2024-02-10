@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     # Run the algorithm
     t0 = perf_counter()
-    print("Running LDA...")
+    print("Running LDA (may take a couple minutes)...")
     lda_model, corpus = gensim_lda(K, data_gen)
     get_topic_distribution(lda_model, corpus, doc_n=0)
 

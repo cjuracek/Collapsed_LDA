@@ -1,22 +1,25 @@
-# Implement SKLEARN LatentDirichletAllocation with varitional Bayes on the Reuter dataset
-# Ref: Olivier Grisel
-#      Lars Buitinck
-#      Chyi-Kwei Yau
-from time import time
+"""Implement SKLEARN LatentDirichletAllocation with varitional Bayes on the Reuter dataset
+Ref: Olivier Grisel
+     Lars Buitinck
+     Chyi-Kwei Yau
+"""
+from time import perf_counter
 
+import click
 from sklearn.decomposition import LatentDirichletAllocation
-from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from sklearn.feature_extraction.text import CountVectorizer
 
 from collapsed_lda.comparisons.print_sklearn import *
 from collapsed_lda.utility import *
 
-if __name__ == "__main__":
-    n_topics = 5
-    n_top_words = 10
-    n_samples = 10
 
-    ###### First get the data ready similarly to our implemented example
-    with open("../Data/reuters21578/reut2-000.sgm") as f:
+@click.command()
+@click.option("--n-topics", default=5, type=int)
+@click.option("--n-top-words", default=10, type=int)
+@click.option("--n-iter", default=10, type=int)
+def main(n_topics, n_top_words, n_iter):
+    # Get the data ready similarly to our implemented example
+    with open("data/reuters21578/reut2-000.sgm") as f:
         data = f.read()
 
     title_docs = parse_sgm_file(data)
@@ -32,36 +35,39 @@ if __name__ == "__main__":
         title: stem_tokens(tokens) for title, tokens in titles_to_tokens.items()
     }
 
-    # Transforming the data to a list of texts according to the required format for the count vectorizer
+    # Transform the data to a list of texts according to the required format for the CountVectorizer
     data_skl = list(titles_to_tokens_stem.values())
-    for i in range(len(data_skl)):
-        data_skl[i] = " ".join(
-            (data_skl[i])  # note double parens, join() takes an iterable
-        )
-    # Getting list of doc titles
-    docs_skl = list(titles_to_tokens_stem)
+    data_skl = [" ".join(doc) for doc in data_skl]
 
-    ##### Second run the algorithm
-    t0 = time()
     # Use tf (raw term count) features for LDA.
     print("Extracting tf features for LDA...")
-    tf_vectorizer = CountVectorizer()
+    count_vectorizer = CountVectorizer()
+    doc_word_matrix = count_vectorizer.fit_transform(data_skl)
 
-    tf = tf_vectorizer.fit_transform(data_skl)
-    print()
-
-    print("Fitting LDA models with tf features, " "n_samples=%d ..." % (n_samples))
-
+    # Run the algorithm
+    t0 = perf_counter()
+    print(f"Fitting LDA model with n_iter={n_iter}...")
     lda_skl = LatentDirichletAllocation(
-        n_components=n_topics, learning_method="online", random_state=0
+        n_components=n_topics,
+        learning_method="online",
+        random_state=0,
+        verbose=1,
+        max_iter=n_iter,
     )
-    lda_skl.fit(tf)  # fititng model
-    print("done in %0.3fs." % (time() - t0))
+    lda_skl.fit(doc_word_matrix)
+    t1 = perf_counter()
+    print(f"Done in {t1 - t0:.3f}s\n")
 
-    print("\nTopics in LDA model:")
-    tf_feature_names = tf_vectorizer.get_feature_names()
-    print_top_words(lda_skl, tf_feature_names, n_top_words)  # Printing n top words
+    print("Top words by topic:")
+    tf_feature_names = count_vectorizer.get_feature_names_out()
+    print_top_words(lda_skl, tf_feature_names, n_top_words)
 
-    doc_n = 0  # get topics for a given doc:
-    print("\nTopics in Doc %s :" % docs_skl[doc_n])
-    topics_spec_doc(lda_skl, tf, n_topics, doc_n)
+    # Get topic distributions for a sample doc
+    doc_titles = list(titles_to_tokens_stem)
+    doc_n = 0
+    print(f'Topic distribution for Doc "{doc_titles[doc_n]}":')
+    topics_spec_doc(lda_skl, doc_word_matrix, n_topics, doc_n)
+
+
+if __name__ == "__main__":
+    main()

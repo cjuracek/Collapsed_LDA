@@ -51,7 +51,7 @@ if __name__ == "__main__":
     t0 = perf_counter()
     print("Running LDA...")
     lda_model, corpus = gensim_lda(K, data_gen)
-    topic_spec_doc_gen(lda_model, corpus, doc_n=0)
+    get_topic_distribution(lda_model, corpus, doc_n=0)
 
     doc_lda = lda_model[corpus]
     t1 = perf_counter()

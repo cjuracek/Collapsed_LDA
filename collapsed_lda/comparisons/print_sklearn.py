@@ -23,7 +23,7 @@ def topics_spec_doc(
     : doc_n: Placement number of the document desired in dataset
     """
     for topic in range(n_topics):
-        message = f"Topic #{topic}:"
-        message += str(round(model.transform(data)[doc_n, topic], 4))
+        topic_proability = str(round(model.transform(data)[doc_n, topic], 4))
+        message = f"Topic #{topic}: {topic_proability}"
         print(message)
     print()

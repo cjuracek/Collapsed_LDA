@@ -181,8 +181,7 @@ class LatentDirichletAllocation:
         )
 
     def _compute_MC_topic_approx(self, document_word_topics_MC):
-        """
-        Given a Markov chain of word topics, compute a Monte Carlo approximation by picking mode of topics
+        """Given a Markov chain of word topics, compute a Monte Carlo approximation by picking mode of topics
 
         :param document_word_topics_MC: Dictionary that maps identifiers (titles) to a Markov chain of their topics
         :return: Dictionary that maps identifiers (titles) to the Monte Carlo approx of their topics (mode)

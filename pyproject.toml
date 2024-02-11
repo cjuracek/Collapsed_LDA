@@ -21,6 +21,9 @@ spacy = "^3.7.2"
 click = "^8.1.7"
 html5lib = "^1.1"
 
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

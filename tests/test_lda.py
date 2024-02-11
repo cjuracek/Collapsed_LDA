@@ -90,6 +90,19 @@ def test_compute_theta_estimates_has_correct_values(lda):
 
 # Test LatentDirichletAllocation._compute_MC_topic_approx()
 
+
+def test_compute_mc_topic_approx_gives_correct_values(lda):
+    # 3 words in Doc 0, 2 words in Doc 1. Run for 3 iterations
+    word_topics_MC = {
+        "doc_0": [[1, 0, 1], [1, 1, 0], [1, 0, 0]],
+        "doc_1": [[0, 0, 0], [0, 0, 1]],
+    }
+    expected_topics = {"doc_0": [1, 1, 0], "doc_1": [0, 0]}
+    lda._compute_MC_topic_approx(document_word_topics_MC=word_topics_MC)
+    test_topics = lda.document_word_topics
+    assert test_topics == expected_topics
+
+
 # TODO
 
 # Test LatentDirichletAllocation.get_top_n_words()

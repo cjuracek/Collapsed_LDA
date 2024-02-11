@@ -63,7 +63,30 @@ def test_compute_phi_estimates_expected_values(lda):
 
 # Test LatentDirichletAllocation._compute_theta_estimates()
 
-# TODO
+
+def test_compute_theta_estimates_has_correct_shape(lda):
+    doc_topic_counts = {"doc_1": {}, "doc_2": {}}
+    lda._compute_theta_estimates(document_topic_counts=doc_topic_counts)
+
+    test_theta = lda.theta_matrix
+    expected_shape = (lda.K, len(doc_topic_counts))
+    assert test_theta.shape == expected_shape
+
+
+def test_compute_theta_estimates_has_correct_values(lda):
+    doc_topic_counts = {"doc_1": {0: 5, 1: 2}, "doc_2": {0: 1, 1: 8}}
+    lda._compute_theta_estimates(document_topic_counts=doc_topic_counts)
+
+    K_alpha = lda.K * lda.alpha
+    expected_theta = np.array(
+        [
+            [(5 + lda.alpha) / (7 + K_alpha), (1 + lda.alpha) / (9 + K_alpha)],
+            [(2 + lda.alpha) / (7 + K_alpha), (8 + lda.alpha) / (9 + K_alpha)],
+        ]
+    )
+    test_theta = lda.theta_matrix
+    assert np.allclose(test_theta, expected_theta)
+
 
 # Test LatentDirichletAllocation._compute_MC_topic_approx()
 

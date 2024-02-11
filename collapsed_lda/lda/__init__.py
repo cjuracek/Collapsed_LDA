@@ -99,7 +99,7 @@ class LatentDirichletAllocation:
 
             phi[i, j] = probability mass of word j in topic i
 
-        Equation given at end of section 3 of Porteous et al.
+        Equation given at the end of section 3 of Porteous et al.
 
         :param word_topic_counts: Dictionary that maps words to their respective counts per topic
         :param total_topic_counts: Dictionary that maps each topic to the number of times it appears in corpus
@@ -115,17 +115,22 @@ class LatentDirichletAllocation:
                     N_k + self.W * self.beta
                 )
 
-    def _compute_theta_estimates(self, document_topic_counts):
-        """
-        Compute a matrix containing the mixture components of each document
+    def _compute_theta_estimates(
+        self, document_topic_counts: Dict[str, Dict[int, int]]
+    ):
+        """Compute estimate of the theta matrix. The theta matrix captures the topic mixtures of each document, such that:
+
+            theta[i, j] = Topic mixture of topic i in document j
+
+        Equation given at the end of section 3 of Porteous et al.
 
         :param document_topic_counts: A dictionary mapping titles to topic counts in that document
         """
         for j, (doc, topics) in enumerate(document_topic_counts.items()):
-            for topic in topics:
-                N_kj = document_topic_counts[doc][topic]
+            for topic_idx in topics:
+                N_kj = document_topic_counts[doc][topic_idx]
                 N_j = sum(document_topic_counts[doc].values())
-                self.theta_matrix[topic, j] = (N_kj + self.alpha) / (
+                self.theta_matrix[topic_idx, j] = (N_kj + self.alpha) / (
                     N_j + self.K * self.alpha
                 )
 

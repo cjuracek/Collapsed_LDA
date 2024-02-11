@@ -17,7 +17,7 @@ class LatentDirichletAllocation:
             alpha = 2 / K
         self.alpha = alpha
         self.beta = beta
-        self.vocabulary = get_unique_words(doc_to_tokens.values())
+        self.vocabulary = sorted(get_unique_words(doc_to_tokens.values()))
         self.W = len(self.vocabulary)
         self.theta_matrix = np.zeros((K, len(doc_to_tokens)))
         self.phi_matrix = np.zeros((K, self.W))

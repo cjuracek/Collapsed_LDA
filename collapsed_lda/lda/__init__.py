@@ -1,6 +1,7 @@
 from collections import Counter
 from random import choices
 from statistics import mode
+from typing import Dict
 
 import numpy as np
 from tqdm import trange
@@ -9,9 +10,11 @@ from collapsed_lda.utility.utility import get_unique_words
 
 
 class LatentDirichletAllocation:
-    def __init__(self, doc_to_tokens, K, alpha, beta=0.01, verbose=True):
+    def __init__(self, doc_to_tokens, K, alpha=None, beta=0.01, verbose=True):
         self.iden_to_tokens = doc_to_tokens
         self.K = K
+        if alpha is None:
+            alpha = 2 / K
         self.alpha = alpha
         self.beta = beta
         self.vocabulary = get_unique_words(doc_to_tokens.values())
@@ -87,20 +90,30 @@ class LatentDirichletAllocation:
         self._compute_phi_estimates(word_topic_counts, total_topic_counts)
         self._compute_theta_estimates(document_topic_counts)
 
-    def _compute_phi_estimates(self, word_topic_counts, total_topic_counts):
-        """
-        Compute estimate of the phi matrix, containing word distributions per topic
+    def _compute_phi_estimates(
+        self,
+        word_topic_counts: Dict[str, Dict[int, int]],
+        total_topic_counts: Dict[int, int],
+    ):
+        """Compute estimate of the phi matrix. The phi matrix captures word distributions per topic, such that
+
+            phi[i, j] = probability mass of word j in topic i
+
+        Equation given at end of section 3 of Porteous et al.
 
         :param word_topic_counts: Dictionary that maps words to their respective counts per topic
         :param total_topic_counts: Dictionary that maps each topic to the number of times it appears in corpus
+        :returns: Array of shape (K, V), such that the phi[i, j] = probability mass of word j in token i
         """
 
-        for w, word in enumerate(self.vocabulary):
-            for k in range(self.K):
-                N_wk = word_topic_counts[word][k]
-                N_k = total_topic_counts[k]
+        for word_idx, word in enumerate(self.vocabulary):
+            for topic_idx in range(self.K):
+                N_wk = word_topic_counts[word][topic_idx]
+                N_k = total_topic_counts[topic_idx]
 
-                self.phi_matrix[k, w] = (N_wk + self.beta) / (N_k + self.W * self.beta)
+                self.phi_matrix[topic_idx, word_idx] = (N_wk + self.beta) / (
+                    N_k + self.W * self.beta
+                )
 
     def _compute_theta_estimates(self, document_topic_counts):
         """

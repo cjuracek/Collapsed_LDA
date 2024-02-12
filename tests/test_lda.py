@@ -105,4 +105,25 @@ def test_compute_mc_topic_approx_gives_correct_values(lda):
 
 # Test LatentDirichletAllocation.get_top_n_words()
 
-# TODO
+
+def test_get_top_0_words_returns_empty(lda):
+    test_top_words = lda.get_top_n_words(n=0, return_probs=False)
+    expected_top_words = {k: [] for k in range(lda.K)}
+    assert test_top_words == expected_top_words
+
+
+def test_get_top_n_words_gives_top_singular_word(lda):
+    lda.phi_matrix = np.array(
+        [[0.8, 0.05, 0.05, 0.05, 0.05], [0.05, 0.05, 0.05, 0.05, 0.8]]
+    )
+    test_top_words = lda.get_top_n_words(n=1, return_probs=False)
+    assert test_top_words == {0: ["alpha"], 1: ["echo"]}
+
+
+def test_get_top_n_words_gives_expected_prob(lda):
+    lda.phi_matrix = np.array(
+        [[0.8, 0.05, 0.05, 0.05, 0.05], [0.05, 0.05, 0.05, 0.05, 0.8]]
+    )
+    test_top_words = lda.get_top_n_words(n=1, return_probs=True)
+    test_probs = {k: word_info[0][1] for k, word_info in test_top_words.items()}
+    assert test_probs == {0: 0.8, 1: 0.8}

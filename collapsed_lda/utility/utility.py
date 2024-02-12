@@ -1,4 +1,5 @@
 import string
+from typing import List
 
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
@@ -108,7 +109,7 @@ def filter_extremes(docs, vocabulary, more_than=10):
     return tokens
 
 
-def get_unique_words(tokens):
+def get_unique_words(tokens: List[List[str]]):
     """
     Provide a list of unique tokens present in the list tokens
 

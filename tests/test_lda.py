@@ -103,8 +103,6 @@ def test_compute_mc_topic_approx_gives_correct_values(lda):
     assert test_topics == expected_topics
 
 
-# TODO
-
 # Test LatentDirichletAllocation.get_top_n_words()
 
 # TODO

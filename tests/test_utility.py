@@ -1,6 +1,17 @@
-from collapsed_lda.utility.utility import get_unique_words
+from collapsed_lda.utility.utility import filter_extremes, get_unique_words
 
-# Test get_unique_words
+# Test filter_extremes()
+
+
+def test_filter_extremes_rare_word_boundary_condition():
+    rare_tokens = ["rare"] * 10
+    common_tokens = ["common"] * 11
+    doc = [*rare_tokens, *common_tokens]
+    test_tokens = filter_extremes([doc], vocabulary=["rare", "common"])[0]
+    assert test_tokens == common_tokens
+
+
+# Test get_unique_words()
 
 
 def test_get_unique_words_across_documents():

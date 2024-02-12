@@ -97,7 +97,7 @@ def preprocess_spacy_doc(doc, stop_words):
 
 # Filter out rare tokens. Per Porteous the vocabulary was filtered
 # "only keeping words that occurred more than ten times"
-def filter_extremes(docs, vocabulary, more_than=10):
+def filter_extremes(docs: List[List[str]], vocabulary, more_than: int = 10):
     # Take words that appear more than "more than" times
     good_words = [
         word

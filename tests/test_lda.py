@@ -1,7 +1,5 @@
 import numpy as np
 
-from collapsed_lda.lda import LatentDirichletAllocation
-
 # Test LatentDirichletAllocation._compute_phi_estimates()
 
 

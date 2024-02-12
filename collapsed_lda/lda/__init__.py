@@ -1,7 +1,7 @@
 from collections import Counter
 from random import choices
 from statistics import mode
-from typing import Dict
+from typing import Dict, List
 
 import numpy as np
 from tqdm import trange
@@ -199,7 +199,7 @@ class LatentDirichletAllocation:
 
         self.document_word_topics = document_word_topics
 
-    def get_top_n_words(self, n, return_probs=False):
+    def get_top_n_words(self, n: int, return_probs=False) -> Dict[int, List]:
         """
         Calculate the top n words with highest posterior probability for every topic
 
@@ -209,9 +209,9 @@ class LatentDirichletAllocation:
         """
         topic_top_words = {}
 
-        for k in range(self.phi_matrix.shape[0]):
+        for k, topic_word_distribution in enumerate(self.phi_matrix):
             # Find the top probability indices, then take the first n of them
-            top_n_idx = np.argsort(self.phi_matrix[k, :])[::-1][:n]
+            top_n_idx = np.argsort(topic_word_distribution)[::-1][:n]
             top_n_words = [self.vocabulary[i] for i in top_n_idx]
 
             if return_probs:

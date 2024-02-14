@@ -95,14 +95,14 @@ def preprocess_spacy_doc(doc, stop_words):
     return lemmas
 
 
-# Filter out rare tokens. Per Porteous the vocabulary was filtered
-# "only keeping words that occurred more than ten times"
 def filter_extremes(docs: List[List[str]], vocabulary, more_than: int = 10):
+    """Filter out rare tokens. Per Porteous the vocabulary was filtered 'by only keeping words that occurred
+    more than ten times'"""
     # Take words that appear more than "more than" times
     good_words = [
         word
         for word in tqdm(vocabulary)
-        if more_than < sum([word in doc for doc in docs])
+        if more_than < sum([doc.count(word) for doc in docs])
     ]
 
     tokens = [[word for word in doc if word in good_words] for doc in docs]

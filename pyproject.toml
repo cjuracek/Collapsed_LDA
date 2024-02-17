@@ -28,6 +28,9 @@ pre-commit = "^3.6.1"
 [tool.black]
 line-length = 99
 
+[tool.isort]
+profile = "black"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -1,4 +1,6 @@
-from collapsed_lda.utility.utility import filter_extremes, get_unique_words
+import string
+
+from collapsed_lda.utility.utility import filter_extremes, get_unique_words, tokenize_doc
 
 # Test filter_extremes()
 
@@ -32,3 +34,30 @@ def test_get_unique_words_across_documents():
 def test_get_unique_words_within_documents():
     test_unique_words = get_unique_words([["duplicate", "duplicate"]])
     assert test_unique_words == ["duplicate"]
+
+
+# Test tokenize_doc()
+
+
+def test_tokenize_doc_normal_use_case():
+    doc = "This! Is a test document."
+    processed_doc = tokenize_doc(doc)
+    assert processed_doc == ["this", "is", "a", "test", "document"]
+
+
+def test_tokenize_doc_lowercases():
+    doc = "THIS IS UPPERCASE"
+    processed_doc = tokenize_doc(doc)
+    assert all([token.islower() for token in processed_doc])
+
+
+def test_tokenize_doc_removes_punctuation():
+    test_doc = f"token1 {string.punctuation} token2"
+    processed_doc = tokenize_doc(test_doc)
+    assert not any([punctuation in processed_doc for punctuation in string.punctuation])
+
+
+def test_tokenize_doc_irregular_whitespace_removed():
+    test_doc = f"token1 {string.whitespace} \x03 token2"
+    processed_doc = tokenize_doc(test_doc)
+    assert not any([whitespace in processed_doc for whitespace in string.whitespace + "\x03"])

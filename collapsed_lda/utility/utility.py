@@ -29,7 +29,7 @@ def parse_sgm_file(sgm_data):
     return title_docs
 
 
-def tokenize_doc(doc):
+def tokenize_doc(doc: str):
     """
     Convert document to lowercase, remove punctuation, and split on whitespace
 
@@ -44,9 +44,7 @@ def tokenize_doc(doc):
     return doc_no_punc.split()
 
 
-def remove_stop_words(
-    tokens, remove_numbers=True, tokens_have_quotes=False, extra_words=None
-):
+def remove_stop_words(tokens, remove_numbers=True, tokens_have_quotes=False, extra_words=None):
     """
     Remove top 50 most common stop words, along with numbers, and additional extra words
 
@@ -100,9 +98,7 @@ def filter_extremes(docs: List[List[str]], vocabulary, more_than: int = 10):
     more than ten times'"""
     # Take words that appear more than "more than" times
     good_words = [
-        word
-        for word in tqdm(vocabulary)
-        if more_than < sum([doc.count(word) for doc in docs])
+        word for word in tqdm(vocabulary) if more_than < sum([doc.count(word) for doc in docs])
     ]
 
     tokens = [[word for word in doc if word in good_words] for doc in docs]

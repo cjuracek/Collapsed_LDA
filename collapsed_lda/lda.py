@@ -1,6 +1,7 @@
 from collections import Counter
 from random import choices
 from statistics import mode
+from typing import Dict, List
 
 import numpy as np
 from tqdm import trange
@@ -9,12 +10,14 @@ from collapsed_lda.utility.utility import get_unique_words
 
 
 class LatentDirichletAllocation:
-    def __init__(self, doc_to_tokens, K, alpha, beta=0.01, verbose=True):
+    def __init__(self, doc_to_tokens, K, alpha=None, beta=0.01, verbose=True):
         self.iden_to_tokens = doc_to_tokens
         self.K = K
+        if alpha is None:
+            alpha = 2 / K
         self.alpha = alpha
         self.beta = beta
-        self.vocabulary = get_unique_words(doc_to_tokens.values())
+        self.vocabulary = sorted(get_unique_words(doc_to_tokens.values()))
         self.W = len(self.vocabulary)
         self.theta_matrix = np.zeros((K, len(doc_to_tokens)))
         self.phi_matrix = np.zeros((K, self.W))
@@ -87,32 +90,47 @@ class LatentDirichletAllocation:
         self._compute_phi_estimates(word_topic_counts, total_topic_counts)
         self._compute_theta_estimates(document_topic_counts)
 
-    def _compute_phi_estimates(self, word_topic_counts, total_topic_counts):
-        """
-        Compute estimate of the phi matrix, containing word distributions per topic
+    def _compute_phi_estimates(
+        self,
+        word_topic_counts: Dict[str, Dict[int, int]],
+        total_topic_counts: Dict[int, int],
+    ):
+        """Compute estimate of the phi matrix. The phi matrix captures word distributions per topic, such that
+
+            phi[i, j] = probability mass of word j in topic i
+
+        Equation given at the end of section 3 of Porteous et al.
 
         :param word_topic_counts: Dictionary that maps words to their respective counts per topic
         :param total_topic_counts: Dictionary that maps each topic to the number of times it appears in corpus
+        :returns: Array of shape (K, V), such that the phi[i, j] = probability mass of word j in token i
         """
 
-        for w, word in enumerate(self.vocabulary):
-            for k in range(self.K):
-                N_wk = word_topic_counts[word][k]
-                N_k = total_topic_counts[k]
+        for word_idx, word in enumerate(self.vocabulary):
+            for topic_idx in range(self.K):
+                N_wk = word_topic_counts[word][topic_idx]
+                N_k = total_topic_counts[topic_idx]
 
-                self.phi_matrix[k, w] = (N_wk + self.beta) / (N_k + self.W * self.beta)
+                self.phi_matrix[topic_idx, word_idx] = (N_wk + self.beta) / (
+                    N_k + self.W * self.beta
+                )
 
-    def _compute_theta_estimates(self, document_topic_counts):
-        """
-        Compute a matrix containing the mixture components of each document
+    def _compute_theta_estimates(
+        self, document_topic_counts: Dict[str, Dict[int, int]]
+    ):
+        """Compute estimate of the theta matrix. The theta matrix captures the topic mixtures of each document, such that:
+
+            theta[i, j] = Topic mixture of topic i in document j
+
+        Equation given at the end of section 3 of Porteous et al.
 
         :param document_topic_counts: A dictionary mapping titles to topic counts in that document
         """
         for j, (doc, topics) in enumerate(document_topic_counts.items()):
-            for topic in topics:
-                N_kj = document_topic_counts[doc][topic]
+            for topic_idx in topics:
+                N_kj = document_topic_counts[doc][topic_idx]
                 N_j = sum(document_topic_counts[doc].values())
-                self.theta_matrix[topic, j] = (N_kj + self.alpha) / (
+                self.theta_matrix[topic_idx, j] = (N_kj + self.alpha) / (
                     N_j + self.K * self.alpha
                 )
 
@@ -163,8 +181,8 @@ class LatentDirichletAllocation:
         )
 
     def _compute_MC_topic_approx(self, document_word_topics_MC):
-        """
-        Given a Markov chain of word topics, compute a Monte Carlo approximation by picking mode of topics
+        """Given a Markov chain of word topics, compute a Monte Carlo approximation by picking mode of topics. If 2 or
+        more topics are tied in highest frequency, pick the one which occurs first.
 
         :param document_word_topics_MC: Dictionary that maps identifiers (titles) to a Markov chain of their topics
         :return: Dictionary that maps identifiers (titles) to the Monte Carlo approx of their topics (mode)
@@ -181,7 +199,7 @@ class LatentDirichletAllocation:
 
         self.document_word_topics = document_word_topics
 
-    def get_top_n_words(self, n, return_probs=False):
+    def get_top_n_words(self, n: int, return_probs=False) -> Dict[int, List]:
         """
         Calculate the top n words with highest posterior probability for every topic
 
@@ -191,9 +209,9 @@ class LatentDirichletAllocation:
         """
         topic_top_words = {}
 
-        for k in range(self.phi_matrix.shape[0]):
+        for k, topic_word_distribution in enumerate(self.phi_matrix):
             # Find the top probability indices, then take the first n of them
-            top_n_idx = np.argsort(self.phi_matrix[k, :])[::-1][:n]
+            top_n_idx = np.argsort(topic_word_distribution)[::-1][:n]
             top_n_words = [self.vocabulary[i] for i in top_n_idx]
 
             if return_probs:

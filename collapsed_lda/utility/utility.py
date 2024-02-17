@@ -4,6 +4,7 @@ from typing import List
 from bs4 import BeautifulSoup
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
+from spacy.tokens import Doc
 from tqdm import tqdm
 
 
@@ -45,8 +46,7 @@ def tokenize_doc(doc: str):
 
 
 def remove_stop_words(tokens, remove_numbers=True, tokens_have_quotes=False, extra_words=None):
-    """
-    Remove top 50 most common stop words, along with numbers, and additional extra words
+    """Remove top 50 most common stop words, along with numbers, and additional extra words
 
     :param tokens: List of tokens
     :param remove_numbers: Should number strings be removed from the tokens?
@@ -61,8 +61,9 @@ def remove_stop_words(tokens, remove_numbers=True, tokens_have_quotes=False, ext
     stop_words = stopwords.words("English")
     stop_words += extra_words
 
-    if not tokens_have_quotes:
+    if tokens_have_quotes:
         stop_words = set([word.replace("'", "") for word in stop_words])
+        tokens = [token.replace("'", "") for token in tokens]
 
     tokens_no_stop = [token for token in tokens if token not in stop_words]
     if remove_numbers:
@@ -84,7 +85,10 @@ def stem_tokens(tokens):
 
 
 # Remove stop words and lemmatize
-def preprocess_spacy_doc(doc, stop_words):
+def preprocess_spacy_doc(doc: Doc, stop_words=None):
+    if stop_words is None:
+        stop_words = []
+
     # Get all lowercased lemmas from document
     lemmas = [token.lemma_.lower() for token in doc if token.text.isalpha()]
 
